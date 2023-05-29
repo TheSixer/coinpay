@@ -1,6 +1,5 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Button, Card, CardContent, FormControl, IconButton, Input, InputAdornment, InputLabel, Stack, Typography } from "@mui/material";
-import grey from "@mui/material/colors/grey";
 import { useRequest, useThrottleFn } from "ahooks";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +24,14 @@ const Login = () => {
       password
     })
   }, { wait: 1000 })
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+
+    if (token) {
+      navigate('/trader/balance')
+    }
+  }, []);
 
   useEffect(() => {
     if (data && !data?.code) {
@@ -73,7 +80,7 @@ const Login = () => {
               />
             </FormControl>
           </Stack>
-          <Button sx={{ mt: 6, mb: 4, width: '100%' }} disabled={loading} variant="contained" onClick={handleSubmit}>登 录</Button>
+          <Button sx={{ mt: 6, mb: 4, width: '100%' }} disabled={loading || !userName || !password} variant="contained" onClick={handleSubmit}>登 录</Button>
         </CardContent>
       </Card>
     </div>

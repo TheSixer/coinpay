@@ -70,7 +70,7 @@ const PayInfo = (props: IProps) => {
                             <Chip icon={<CreditCardIcon />} color="warning" label="网银转账" variant="outlined" />
                             <Stack direction="row" width="100%" justifyContent="space-between">
                                 <span>价格</span>
-                                <span>{ data?.usdRate }USDT</span>
+                                <span>¥{ data?.usdRate }</span>
                             </Stack>
                             <Stack direction="row" width="100%" justifyContent="space-between">
                                 <span>数量</span>

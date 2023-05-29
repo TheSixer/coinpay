@@ -212,7 +212,7 @@ const TradingList = () => {
                   </TableCell>
                   <TableCell align="left">
                     {
-                      row.status === 'paid' ? (
+                      row.status === 'confirm' ? (
                         <>
                           <Stack direction="row" spacing={1}>
                             <Button size="small" variant="contained" color="success" onClick={() => {

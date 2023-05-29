@@ -1,4 +1,7 @@
 import axios from 'axios'
+import CodeErr from '../constants'
+import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 
 console.log(process.env)
 
@@ -49,7 +52,26 @@ export const toSnackCase: any = (object: any) => {
 CustomAxios.interceptors.response.use(
     (response) => {
         response.data = toCamelCase(response.data)
-        return response.data
+        console.log(response.data)
+        const { code } = response.data
+        if (!code) {
+            return response.data
+        }
+        switch (code) {
+            case 401:
+            case 403:
+            case 404:
+            case 405:
+            case 407:
+                localStorage.removeItem('token')
+                toast.error(CodeErr[code]);
+                const navigate = useNavigate();
+                navigate('/');
+                break;
+            default:
+                toast.error(CodeErr[code]);
+                break;
+        }
     },
     (error) => {
         return Promise.reject(error)
