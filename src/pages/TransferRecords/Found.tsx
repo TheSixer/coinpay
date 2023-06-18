@@ -1,10 +1,22 @@
-import { Box, Button, Chip, CircularProgress, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Toolbar, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Box, Button, Chip, CircularProgress, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, Toolbar, FormControl, InputLabel, Select, MenuItem, Modal } from "@mui/material";
 import { useThrottleFn } from "ahooks";
 import useRequest from "ahooks/lib/useRequest";
 import { useState } from "react";
-import { queryTradingList, confirmRecieve,  confirmReject } from "../services/order"
-import { toast } from 'react-toastify'
+import { queryRechargeList } from "../../services/order"
 import { grey } from '@mui/material/colors';
+import { useStateWithCallback } from '../../hooks';
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 function EnhancedTableHead() {
   const headCells = [
@@ -15,28 +27,10 @@ function EnhancedTableHead() {
       label: '订单号'
     },
     {
-      id: 'amount',
-      numeric: true,
-      disablePadding: true,
-      label: '金额（CNY）'
-    },
-    {
       id: 'usdAmount',
       numeric: true,
       disablePadding: true,
       label: '金额（USDT）'
-    },
-    {
-      id: 'usdRate',
-      numeric: true,
-      disablePadding: true,
-      label: '汇率'
-    },
-    {
-      id: 'realName',
-      numeric: true,
-      disablePadding: true,
-      label: '真实姓名'
     },
     {
       id: 'createTime',
@@ -51,16 +45,16 @@ function EnhancedTableHead() {
       label: '更新时间'
     },
     {
+      id: 'certificateUrl',
+      numeric: true,
+      disablePadding: true,
+      label: '交易凭证'
+    },
+    {
       id: 'status',
       numeric: true,
       disablePadding: true,
       label: '状态'
-    },
-    {
-      id: 'id',
-      numeric: true,
-      disablePadding: true,
-      label: '操作'
     },
   ];
   return (
@@ -118,15 +112,14 @@ function EnhancedTableToolbar(props: any) {
 }
 
 const TradingList = () => {
+  const [open, setOpen] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
-  const [isShowConfirm, setIsShowConfirm] = useState(false);
-  const [isShowReject, setIsShowReject] = useState(false);
-  const [orderCode, setOrderCode] = useState('');
-  const [reason, setReason] = useState('');
   const [status, setStatus] = useState('');
+  const [img, setImg] = useStateWithCallback('');
   
-  const { data, loading, run: fetchList } = useRequest(queryTradingList, {
+  
+  const { data, loading, run: fetchList } = useRequest(queryRechargeList, {
     defaultParams: [{ page: page + 1, limit: rowsPerPage, status }]
   });
 
@@ -144,35 +137,15 @@ const TradingList = () => {
     fetchList({ page: 1, limit: event.target.value });
   };
 
-  const { run: handleConfirm } = useThrottleFn(async () => {
-    const { code, msg } = await confirmRecieve({
-      orderCode,
-    })
-    if (!code) {
-      fetchList({ page: 1, limit: rowsPerPage });
-      setIsShowConfirm(false);
-    } else {
-      toast.error(msg)
-    }
-  }, { wait: 1000 })
-
-  const { run: handleReject } = useThrottleFn(async () => {
-    const { code, msg } = await confirmReject({
-      orderCode,
-      reason
-    })
-    if (!code) {
-      setPage(0);
-      fetchList({ page: 1, limit: rowsPerPage });
-      setIsShowReject(false);
-    } else {
-      toast.error(msg)
-    }
-  }, { wait: 1000 })
-
   const handleSearch = (status: string) => {
     setStatus(status);
     fetchList({ page: page + 1, limit: rowsPerPage, status });
+  }
+
+  const showImg = (url?: string) => {
+    setImg(url || '', () => {
+      setOpen(!open);
+    })
   }
 
   return (
@@ -199,45 +172,17 @@ const TradingList = () => {
                 >
                   <TableCell align="left">{row.orderCode}</TableCell>
                   <TableCell align="left">¥{Math.floor(row.amount * 100) / 10000}</TableCell>
-                  <TableCell align="left">${Math.floor(row.usdAmount * 100) / 10000}</TableCell>
-                  <TableCell align="left">{row.usdRate}</TableCell>
-                  <TableCell align="left">{row.realName || '-'}</TableCell>
-                  <TableCell align="left">{row.createTime}</TableCell>
-                  <TableCell align="left">{row.updateTime}</TableCell>
+                  <TableCell align="left">{row.createTime || '-'}</TableCell>
+                  <TableCell align="left">{row.auditTime || '-'}</TableCell>
+                  <TableCell align="left">
+                    <img className="pointer" src={row.certificateUrl} width={120} alt="交易凭证" onClick={() => showImg(row.certificateUrl)} />
+                  </TableCell>
                   <TableCell align="right">
                     <Chip
                       label={row.status === 'wait' ? '待支付' : row.status === 'confirm' ? '已转账' : row.status === 'paid' ? '已支付' : row.status === 'cancle' ? '已取消' : '已驳回'}
                       color={row.status === 'wait' ? 'warning' : row.status === 'paid' || row.status === 'confirm' ? 'success' : 'error'}
                       variant="outlined"
                     />
-                  </TableCell>
-                  <TableCell align="left">
-                    {
-                      row.status === 'confirm' ? (
-                        <>
-                          <Stack direction="row" spacing={1}>
-                            <Button size="small" variant="contained" color="success" onClick={() => {
-                              setOrderCode(row.orderCode)
-                              setIsShowConfirm(true)
-                            }}>
-                              通过
-                            </Button>
-                            <Button size="small" variant="outlined" color="error" onClick={() => {
-                              setReason('')
-                              setOrderCode(row.orderCode)
-                              setIsShowReject(true)
-                            }}>
-                              拒绝
-                            </Button>
-                          </Stack>
-                        </>
-                      ): (
-                        <Chip
-                          label={row.status === 'wait' ? '待支付' : row.status === 'confirm' ? '已完成' : row.status === 'paid' ? '已支付' : row.status === 'cancle' ? '已取消' : '已驳回'}
-                          variant="outlined"
-                        />
-                      )
-                    }
                   </TableCell>
                 </TableRow>
               );
@@ -272,59 +217,16 @@ const TradingList = () => {
           />
         </>
       )}
-      <Dialog
-        open={isShowConfirm}
-        onClose={() => setIsShowConfirm(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+      <Modal
+        open={open}
+        onClose={() => showImg()}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          通过审核
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            您确认已收到转账，此操作将通过该笔转账审核，继续通过？
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsShowConfirm(false)}>取消</Button>
-          <Button onClick={handleConfirm} autoFocus>
-            确认通过
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        open={isShowReject}
-        onClose={() => setIsShowReject(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          拒绝审核
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            您确认未收到转账，此操作将拒绝通过该笔转账审核，继续拒绝？
-          </DialogContentText>
-          <TextField
-            autoFocus
-            value={reason}
-            margin="dense"
-            id="name"
-            label="拒绝原因"
-            type="text"
-            fullWidth
-            variant="standard"
-            onChange={(e: any) => setReason(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsShowReject(false)}>取消</Button>
-          <Button onClick={handleReject} disabled={!reason} autoFocus>
-            确定拒绝
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Box sx={style}>
+          <img src={img} alt="" />
+        </Box>
+      </Modal>
     </div>
   )
 }

@@ -1,11 +1,12 @@
-import { Stack, Typography } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import useRequest from "ahooks/lib/useRequest";
 import { NumericFormat } from "react-number-format";
+import { useNavigate } from "react-router-dom";
 import { queryBalance } from "../services/order"
 
 
 const TradingList = () => {
-
+  const navigate = useNavigate();
   const { data } = useRequest(queryBalance);
 
   const balance = data?.data.balance || 0
@@ -18,11 +19,22 @@ const TradingList = () => {
         账户信息
       </Typography>
 
-      <Stack direction="row" spacing={4}>
-
-        <p>账户余额： <span>$ <NumericFormat value={Math.floor(balance) / 100} displayType={'text'} thousandSeparator={true} /></span></p>
-        <p>冻结余额： <span>$ <NumericFormat value={Math.floor(coolBalance) / 100} displayType={'text'} thousandSeparator={true} /></span></p>
-
+      <Stack direction="row" justifyContent="space-between" spacing={4}>
+        <Stack direction="row" spacing={4}>
+          <p>账户余额： <span>$ <NumericFormat value={Math.floor(balance) / 100} displayType={'text'} thousandSeparator={true} /></span></p>
+          <p>冻结余额： <span>$ <NumericFormat value={Math.floor(coolBalance) / 100} displayType={'text'} thousandSeparator={true} /></span></p>
+        </Stack>
+        <Stack direction="row" spacing={2}>
+          <Button variant="outlined" color="success" onClick={() => navigate('/trader/recharge')}>
+            入金
+          </Button>
+          <Button variant="outlined" color="warning" onClick={() => navigate('/trader/withdraw')}>
+            提现
+          </Button>
+          <Button variant="outlined" color="info" onClick={() => navigate('/trader/cards')}>
+            我的银行卡
+          </Button>
+        </Stack>
       </Stack>
 
     </div>

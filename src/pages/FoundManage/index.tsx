@@ -1,10 +1,23 @@
-import { Box, Button, Chip, CircularProgress, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Toolbar, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Box, Button, Chip, CircularProgress, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Toolbar, FormControl, InputLabel, Select, MenuItem, Modal } from "@mui/material";
 import { useThrottleFn } from "ahooks";
 import useRequest from "ahooks/lib/useRequest";
 import { useState } from "react";
-import { queryTradingList, confirmRecieve,  confirmReject } from "../services/order"
+import { queryRechargeList, confirmRecharge,  rejectRecharge } from "../../services/admin"
 import { toast } from 'react-toastify'
 import { grey } from '@mui/material/colors';
+import { useStateWithCallback } from '../../hooks';
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 function EnhancedTableHead() {
   const headCells = [
@@ -15,25 +28,19 @@ function EnhancedTableHead() {
       label: '订单号'
     },
     {
-      id: 'amount',
+      id: 'traderId',
       numeric: true,
       disablePadding: true,
-      label: '金额（CNY）'
+      label: '交易员ID'
     },
     {
-      id: 'usdAmount',
+      id: 'amount',
       numeric: true,
       disablePadding: true,
       label: '金额（USDT）'
     },
     {
-      id: 'usdRate',
-      numeric: true,
-      disablePadding: true,
-      label: '汇率'
-    },
-    {
-      id: 'realName',
+      id: 'traderRealName',
       numeric: true,
       disablePadding: true,
       label: '真实姓名'
@@ -45,10 +52,16 @@ function EnhancedTableHead() {
       label: '创建时间'
     },
     {
-      id: 'updateTime',
+      id: 'auditTime',
       numeric: true,
       disablePadding: true,
       label: '更新时间'
+    },
+    {
+      id: 'certificateUrl',
+      numeric: true,
+      disablePadding: true,
+      label: '交易凭证'
     },
     {
       id: 'status',
@@ -125,8 +138,10 @@ const TradingList = () => {
   const [orderCode, setOrderCode] = useState('');
   const [reason, setReason] = useState('');
   const [status, setStatus] = useState('');
+  const [open, setOpen] = useState(false);
+  const [img, setImg] = useStateWithCallback('');
   
-  const { data, loading, run: fetchList } = useRequest(queryTradingList, {
+  const { data, loading, run: fetchList } = useRequest(queryRechargeList, {
     defaultParams: [{ page: page + 1, limit: rowsPerPage, status }]
   });
 
@@ -145,7 +160,7 @@ const TradingList = () => {
   };
 
   const { run: handleConfirm } = useThrottleFn(async () => {
-    const { code, msg } = await confirmRecieve({
+    const { code, msg } = await confirmRecharge({
       orderCode,
     })
     if (!code) {
@@ -157,7 +172,7 @@ const TradingList = () => {
   }, { wait: 1000 })
 
   const { run: handleReject } = useThrottleFn(async () => {
-    const { code, msg } = await confirmReject({
+    const { code, msg } = await rejectRecharge({
       orderCode,
       reason
     })
@@ -173,6 +188,12 @@ const TradingList = () => {
   const handleSearch = (status: string) => {
     setStatus(status);
     fetchList({ page: page + 1, limit: rowsPerPage, status });
+  }
+
+  const showImg = (url?: string) => {
+    setImg(url || '', () => {
+      setOpen(!open);
+    })
   }
 
   return (
@@ -197,21 +218,23 @@ const TradingList = () => {
                   key={row.orderCode}
                 // sx={{ cursor: 'pointer' }}
                 >
-                  <TableCell align="left">{row.orderCode}</TableCell>
-                  <TableCell align="left">¥{Math.floor(row.amount * 100) / 10000}</TableCell>
-                  <TableCell align="left">${Math.floor(row.usdAmount * 100) / 10000}</TableCell>
-                  <TableCell align="left">{row.usdRate}</TableCell>
-                  <TableCell align="left">{row.realName || '-'}</TableCell>
+                  <TableCell align="left" width={120}>{row.orderCode}</TableCell>
+                  <TableCell align="left">{row.traderId}</TableCell>
+                  <TableCell align="left">${Math.floor(row.amount * 100) / 10000}</TableCell>
+                  <TableCell align="left">{row.traderRealName || '-'}</TableCell>
                   <TableCell align="left">{row.createTime}</TableCell>
-                  <TableCell align="left">{row.updateTime}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align="left">{row.auditTime}</TableCell>
+                  <TableCell align="left">
+                    <img className="pointer" src={row.certificateUrl} width={120} alt="交易凭证" onClick={() => showImg(row.certificateUrl)} />
+                  </TableCell>
+                  <TableCell align="center">
                     <Chip
                       label={row.status === 'wait' ? '待支付' : row.status === 'confirm' ? '已转账' : row.status === 'paid' ? '已支付' : row.status === 'cancle' ? '已取消' : '已驳回'}
                       color={row.status === 'wait' ? 'warning' : row.status === 'paid' || row.status === 'confirm' ? 'success' : 'error'}
                       variant="outlined"
                     />
                   </TableCell>
-                  <TableCell align="left">
+                  <TableCell align="right">
                     {
                       row.status === 'confirm' ? (
                         <>
@@ -325,6 +348,16 @@ const TradingList = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <Modal
+        open={open}
+        onClose={() => showImg()}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <img src={img} alt="" />
+        </Box>
+      </Modal>
     </div>
   )
 }

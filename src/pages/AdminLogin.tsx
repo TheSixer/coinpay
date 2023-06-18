@@ -3,7 +3,7 @@ import { Button, Card, CardContent, FormControl, IconButton, Input, InputAdornme
 import { useRequest, useThrottleFn } from "ahooks";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { traderLogin } from "../services/order";
+import { adminLogin } from "../services/order";
 
 const Login = () => {
   const [userName, setUserName] = useState<string>('');
@@ -12,7 +12,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const navigate = useNavigate();
 
-  const { data, loading, run: handleLogin } = useRequest(traderLogin, {
+  const { data, loading, run: handleLogin } = useRequest(adminLogin, {
     manual: true,
   });
 
@@ -29,15 +29,14 @@ const Login = () => {
     const token = localStorage.getItem('token')
 
     if (token) {
-      navigate('/trader/balance')
+      navigate('/admin/rate')
     }
   }, []);
 
   useEffect(() => {
     if (data && !data?.code) {
-      console.log(data);
       localStorage.setItem('token', data?.data)
-      navigate('/trader/balance');
+      navigate('/admin/rate');
     }
   }, [data])
 
@@ -47,7 +46,7 @@ const Login = () => {
         <CardContent sx={{ py: 4, px: 4, textAlign: 'center' }}>
           <Stack spacing={2}>
             <Typography variant="h6" gutterBottom>
-              交易员登录
+              CoinPay 管理员登录
             </Typography>
             <FormControl variant="standard">
               <InputLabel htmlFor="standard-adornment-userName">用户名</InputLabel>
@@ -81,7 +80,7 @@ const Login = () => {
             </FormControl>
           </Stack>
           <Button sx={{ mt: 6, mb: 4, width: '100%' }} disabled={loading || !userName || !password} variant="contained" onClick={handleSubmit}>登 录</Button>
-          <a className="underline" href="/admin-login">管理员登录</a>
+          <a className="underline" href="/">交易员登录</a>
         </CardContent>
       </Card>
     </div>

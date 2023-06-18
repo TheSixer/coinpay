@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Outlet, useNavigate } from 'react-router-dom';
-import SideMenu from "../components/SideMenu";
+import AdminMenu from "../components/AdminMenu";
 import LogoImg from '../assets/images/logo.png';
 import { Avatar, Button, Grid, Menu, MenuItem, Stack, Tab, Tabs } from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
@@ -46,7 +46,7 @@ const TraderPage = () => {
             aria-expanded={open ? 'true' : undefined}
             onClick={handleClick}
           >
-            Trader
+            Admin
           </Button>
         </Stack>
 
@@ -59,21 +59,21 @@ const TraderPage = () => {
             'aria-labelledby': 'basic-button',
           }}
         >
-          <MenuItem onClick={() => navigate('/trader/balance')}>My account</MenuItem>
           <MenuItem onClick={handleLogout}>Logout</MenuItem>
         </Menu>
       </div>
       <div className="block sm:hidden">
         <Tabs value={value} onChange={handleChange} sx={{mb: 2}}>
-          <Tab label="我的账户" id="balance" />
-          <Tab label="审核列表" id="list" />
-          <Tab label="交易记录" id="transfer-records" />
+          <Tab label="汇率管理" id="rate" />
+          <Tab label="入金审核" id="recharge" />
+          <Tab label="出金审核" id="withdraw" />
+          <Tab label="交易员管理" id="trader" />
         </Tabs>
       </div>
       
       <Grid container spacing={2}>
         <Grid item xs={2} sm={4} md={2} className="hidden sm:block">
-          <SideMenu />
+          <AdminMenu />
         </Grid>
         <Grid item xs={12} sm={8} md={10}>
           <Outlet />

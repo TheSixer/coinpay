@@ -2,7 +2,7 @@ import { Box, Button, Chip, CircularProgress, Stack, Table, TableBody, TableCell
 import { useThrottleFn } from "ahooks";
 import useRequest from "ahooks/lib/useRequest";
 import { useState } from "react";
-import { queryTradingList, confirmRecieve,  confirmReject } from "../services/order"
+import { queryWithdrawList, confirmWithdraw,  rejectWithdraw } from "../../services/admin"
 import { toast } from 'react-toastify'
 import { grey } from '@mui/material/colors';
 
@@ -18,19 +18,7 @@ function EnhancedTableHead() {
       id: 'amount',
       numeric: true,
       disablePadding: true,
-      label: '金额（CNY）'
-    },
-    {
-      id: 'usdAmount',
-      numeric: true,
-      disablePadding: true,
       label: '金额（USDT）'
-    },
-    {
-      id: 'usdRate',
-      numeric: true,
-      disablePadding: true,
-      label: '汇率'
     },
     {
       id: 'realName',
@@ -57,6 +45,12 @@ function EnhancedTableHead() {
       label: '状态'
     },
     {
+      id: 'reason',
+      numeric: true,
+      disablePadding: true,
+      label: '备注'
+    },
+    {
       id: 'id',
       numeric: true,
       disablePadding: true,
@@ -75,7 +69,7 @@ function EnhancedTableHead() {
 }
 
 function EnhancedTableToolbar(props: any) {
-  const [status, setStatus] = useState('wait');
+  const [status, setStatus] = useState<number | string>(-1);
 
   const {
     run: handleSearch,
@@ -96,11 +90,10 @@ function EnhancedTableToolbar(props: any) {
             sx={{ color: 'white', borderColor: grey[400] }}
             onChange={e => setStatus(e.target.value)}
           >
-            <MenuItem value={'wait'}>待支付</MenuItem>
-            <MenuItem value={'confirm'}>已转账</MenuItem>
-            <MenuItem value={'paid'}>已支付</MenuItem>
-            <MenuItem value={'cancle'}>已取消</MenuItem>
-            <MenuItem value={'reject'}>已拒绝</MenuItem>
+            <MenuItem value={-1}>全部</MenuItem>
+            <MenuItem value={0}>待审核</MenuItem>
+            <MenuItem value={1}>已完成</MenuItem>
+            <MenuItem value={2}>已驳回</MenuItem>
           </Select>
         </FormControl>
 
@@ -124,9 +117,9 @@ const TradingList = () => {
   const [isShowReject, setIsShowReject] = useState(false);
   const [orderCode, setOrderCode] = useState('');
   const [reason, setReason] = useState('');
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState<number | string>('');
   
-  const { data, loading, run: fetchList } = useRequest(queryTradingList, {
+  const { data, loading, run: fetchList } = useRequest(queryWithdrawList, {
     defaultParams: [{ page: page + 1, limit: rowsPerPage, status }]
   });
 
@@ -145,7 +138,7 @@ const TradingList = () => {
   };
 
   const { run: handleConfirm } = useThrottleFn(async () => {
-    const { code, msg } = await confirmRecieve({
+    const { code, msg } = await confirmWithdraw({
       orderCode,
     })
     if (!code) {
@@ -157,7 +150,7 @@ const TradingList = () => {
   }, { wait: 1000 })
 
   const { run: handleReject } = useThrottleFn(async () => {
-    const { code, msg } = await confirmReject({
+    const { code, msg } = await rejectWithdraw({
       orderCode,
       reason
     })
@@ -170,9 +163,9 @@ const TradingList = () => {
     }
   }, { wait: 1000 })
 
-  const handleSearch = (status: string) => {
+  const handleSearch = (status: number) => {
     setStatus(status);
-    fetchList({ page: page + 1, limit: rowsPerPage, status });
+    fetchList({ page: page + 1, limit: rowsPerPage, status: status < 0 ? '' : status });
   }
 
   return (
@@ -198,22 +191,21 @@ const TradingList = () => {
                 // sx={{ cursor: 'pointer' }}
                 >
                   <TableCell align="left">{row.orderCode}</TableCell>
-                  <TableCell align="left">¥{Math.floor(row.amount * 100) / 10000}</TableCell>
-                  <TableCell align="left">${Math.floor(row.usdAmount * 100) / 10000}</TableCell>
-                  <TableCell align="left">{row.usdRate}</TableCell>
+                  <TableCell align="left">${Math.floor(row.amount * 100) / 10000}</TableCell>
                   <TableCell align="left">{row.realName || '-'}</TableCell>
                   <TableCell align="left">{row.createTime}</TableCell>
-                  <TableCell align="left">{row.updateTime}</TableCell>
+                  <TableCell align="left">{row.auditTime}</TableCell>
                   <TableCell align="right">
                     <Chip
-                      label={row.status === 'wait' ? '待支付' : row.status === 'confirm' ? '已转账' : row.status === 'paid' ? '已支付' : row.status === 'cancle' ? '已取消' : '已驳回'}
-                      color={row.status === 'wait' ? 'warning' : row.status === 'paid' || row.status === 'confirm' ? 'success' : 'error'}
+                      label={row.status === 1 ? '已驳回' : row.status === 2 ? '已完成' : '待审核'}
+                      color={row.status === 1 ? 'error' : row.status === 2 ? 'success' : 'warning'}
                       variant="outlined"
                     />
                   </TableCell>
-                  <TableCell align="left">
+                  <TableCell align="left">{row.reason}</TableCell>
+                  <TableCell align="right">
                     {
-                      row.status === 'confirm' ? (
+                      !row.status ? (
                         <>
                           <Stack direction="row" spacing={1}>
                             <Button size="small" variant="contained" color="success" onClick={() => {
@@ -233,7 +225,7 @@ const TradingList = () => {
                         </>
                       ): (
                         <Chip
-                          label={row.status === 'wait' ? '待支付' : row.status === 'confirm' ? '已完成' : row.status === 'paid' ? '已支付' : row.status === 'cancle' ? '已取消' : '已驳回'}
+                          label={row.status === 1 ? '已完成' : row.status === 2 ? '已驳回' : '待审核'}
                           variant="outlined"
                         />
                       )
@@ -304,7 +296,7 @@ const TradingList = () => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            您确认未收到转账，此操作将拒绝通过该笔转账审核，继续拒绝？
+            您正在拒绝通过该笔出金审核，确认拒绝？
           </DialogContentText>
           <TextField
             autoFocus

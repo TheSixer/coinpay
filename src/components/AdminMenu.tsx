@@ -9,7 +9,7 @@ import Divider from '@mui/material/Divider';
 import InboxIcon from '@mui/icons-material/Inbox';
 import DraftsIcon from '@mui/icons-material/Drafts';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function BasicList() {
   const navigate = useNavigate();
@@ -19,28 +19,36 @@ export default function BasicList() {
     <Box sx={{ width: '100%', maxWidth: 320 }}>
       <nav aria-label="main mailbox folders">
         <List>
-          <ListItem selected={pathname === '/trader/balance'} disablePadding>
-            <ListItemButton onClick={() => navigate('/trader/balance')}>
+          <ListItem selected={pathname === '/admin/rate'} disablePadding>
+            <ListItemButton onClick={() => navigate('/admin/rate')}>
               <ListItemIcon>
                 <InboxIcon color='secondary' />
               </ListItemIcon>
-              <ListItemText primary="我的账户" />
+              <ListItemText primary="汇率管理" />
             </ListItemButton>
           </ListItem>
-          <ListItem selected={pathname === '/trader/list'} disablePadding>
-            <ListItemButton onClick={() => navigate('/trader/list')}>
+          <ListItem selected={pathname === '/admin/recharge'} disablePadding>
+            <ListItemButton onClick={() => navigate('/admin/recharge')}>
               <ListItemIcon>
                 <DraftsIcon color='secondary' />
               </ListItemIcon>
-              <ListItemText primary="审核列表" />
+              <ListItemText primary="入金审核" />
             </ListItemButton>
           </ListItem>
-          <ListItem selected={pathname === '/trader/transfer-records'} disablePadding>
-            <ListItemButton onClick={() => navigate('/trader/transfer-records')}>
+          <ListItem selected={pathname === '/admin/withdraw'} disablePadding>
+            <ListItemButton onClick={() => navigate('/admin/withdraw')}>
               <ListItemIcon>
                 <ReceiptLongIcon color='secondary' />
               </ListItemIcon>
-              <ListItemText primary="交易记录" />
+              <ListItemText primary="出金审核" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem selected={pathname === '/admin/trader'} disablePadding>
+            <ListItemButton onClick={() => navigate('/admin/trader')}>
+              <ListItemIcon>
+                <ReceiptLongIcon color='secondary' />
+              </ListItemIcon>
+              <ListItemText primary="交易员管理" />
             </ListItemButton>
           </ListItem>
         </List>

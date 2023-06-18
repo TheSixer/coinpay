@@ -1,5 +1,6 @@
-import { createBrowserRouter, useRouteError, redirect, Navigate } from "react-router-dom";
+import { createBrowserRouter, useRouteError, redirect } from "react-router-dom";
 import { Suspense, lazy } from 'react'
+import { Box, CircularProgress } from "@mui/material";
  
 type IRouterBeforeLoad = (res:any, redirectUrl: string, auth: boolean) => Boolean;
 let routerLoader: IRouterBeforeLoad;
@@ -12,10 +13,43 @@ const routes = [
     component:lazy(() => import("../pages/Login"))
   },
   {
+    path: '/admin-login',
+    auth: false,
+    name:"adminLogin",
+    component:lazy(() => import("../pages/AdminLogin"))
+  },
+  {
     path: '/pay',
     auth: false,
     name:"pay",
     component:lazy(() => import("../pages/HomePage"))
+  },
+  {
+    path: '/admin',
+    name:"Admin",
+    component: lazy(() => import('../pages/AdminPage')),
+    children: [
+      { 
+        path: '/admin/rate',
+        auth: true,
+        component:lazy(() => import('../pages/RateManage'))
+      },
+      { 
+        path: '/admin/recharge',
+        auth: true,
+        component:lazy(() => import('../pages/FoundManage'))
+      },
+      { 
+        path: '/admin/withdraw',
+        auth: true,
+        component:lazy(() => import('../pages/WithdrawManage'))
+      },
+      { 
+        path: '/admin/trader',
+        auth: true,
+        component:lazy(() => import('../pages/TraderManage'))
+      },
+    ]
   },
   {
     path: '/trader',
@@ -33,8 +67,33 @@ const routes = [
         component:lazy(() => import('../pages/TradingList'))
       },
       { 
+        path: '/trader/transfer-records',
+        auth: true,
+        component:lazy(() => import('../pages/TransferRecords'))
+      },
+      { 
+        path: '/trader/recharge',
+        auth: true,
+        component:lazy(() => import('../pages/Recharge'))
+      },
+      { 
+        path: '/trader/withdraw',
+        auth: true,
+        component:lazy(() => import('../pages/Withdraw'))
+      },
+      { 
+        path: '/trader/cards',
+        auth: true,
+        component:lazy(() => import('../pages/CardList'))
+      },
+      { 
+        path: '/trader/new-card',
+        auth: true,
+        component:lazy(() => import('../pages/NewCard'))
+      },
+      { 
         path: '*',
-        component: <Navigate to="/trader/balance" replace />
+        component:lazy(() => import('../pages/TraderBalance'))
       },
     ]
   },
@@ -62,7 +121,9 @@ const generateRouter = (routers:any) => {
       item.children = generateRouter(item.children)
     }
     item.element = <Suspense fallback={
-      <div>加载中...</div>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <CircularProgress />
+      </Box>
     }>
       {/* 把懒加载的异步路由变成组件装载进去 */}
       <item.component />
