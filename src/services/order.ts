@@ -34,3 +34,5 @@ export const saveCard = (data: any): Promise<Order.ResponseData> => fetch.post(`
 export const traderWithdraw = (data: any): Promise<Order.ResponseData> => fetch.post(`/trader/withdraw`, data)
 
 export const traderRecharge = (data: any): Promise<Order.ResponseData> => fetch.post(`/trader/recharge`, data)
+
+export const queryNotice = (): Promise<Order.ResponseData> => fetch.get(`/trader/notice/count`)

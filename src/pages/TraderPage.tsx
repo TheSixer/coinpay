@@ -1,16 +1,26 @@
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Outlet, useNavigate } from 'react-router-dom';
 import SideMenu from "../components/SideMenu";
 import LogoImg from '../assets/images/logo.png';
-import { Avatar, Button, Grid, Menu, MenuItem, Stack, Tab, Tabs } from "@mui/material";
+import { Avatar, Badge, Button, Grid, IconButton, Menu, MenuItem, Stack, Tab, Tabs } from "@mui/material";
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import PersonIcon from '@mui/icons-material/Person';
 import { deepPurple } from '@mui/material/colors';
+import { queryNotice } from "../services/order";
+import { useInterval } from "ahooks";
+
+const NoticeAudio = require('../assets/audio/notice.mp3');
 
 const TraderPage = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [notice, setNotice] = useState(0);
   const [value, setValue] = useState(0);
   const open = Boolean(anchorEl);
+  const hasNote = Boolean(notice);
+
+  const noticeRef = useRef<any>(null)
+
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
@@ -28,6 +38,27 @@ const TraderPage = () => {
     navigate(`/trader/${e.target.id}`)
   }
 
+  const handleNotice = async () => {
+    try {
+      const { data } = await queryNotice();
+      setNotice(data || 0);
+      if (data) {
+        noticeRef.current?.play();
+      }
+    } catch (error) {}
+  }
+  
+  const clear = useInterval(() => {
+    handleNotice();
+  }, 5 * 1000);
+
+  useEffect(() => {
+
+    return () => {
+      clear();
+    }
+  }, []);
+
   return (
     <div className="container mx-auto">
       <div className="flex justify-between">
@@ -36,6 +67,11 @@ const TraderPage = () => {
         </a>
 
         <Stack direction="row" spacing={1} alignItems="center">
+          <IconButton color="primary" aria-label="add to shopping cart" onClick={() => setNotice(0)}>
+            <Badge color="secondary" variant="dot" invisible={!hasNote}>
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
           <Avatar sx={{ bgcolor: deepPurple[500] }}>
             <PersonIcon />
           </Avatar>
@@ -89,6 +125,13 @@ const TraderPage = () => {
           </div>
         </div>
       </div> */}
+
+      <audio
+        className="hidden"
+        ref={noticeRef}
+        src={NoticeAudio}
+        autoPlay={false}
+      />
     </div>
   )
 }
