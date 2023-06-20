@@ -50,7 +50,7 @@ const TraderPage = () => {
   
   const clear = useInterval(() => {
     handleNotice();
-  }, 5 * 1000);
+  }, 20 * 1000);
 
   useEffect(() => {
 
