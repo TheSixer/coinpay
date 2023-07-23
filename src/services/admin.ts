@@ -20,3 +20,7 @@ export const queryTraderList = (data: any): Promise<Order.ResponseData> => fetch
 export const disableTrader = (data: { id: string }): Promise<Order.ResponseData> => fetch.post(`/admin/trader/manager/disable`, data)
 
 export const enableTrader = (data: { id: string }): Promise<Order.ResponseData> => fetch.post(`/admin/trader/manager/enable`, data)
+
+export const verifyPass = (data: { id: string }): Promise<Order.ResponseData> => fetch.post(`/admin/trader/manager/verify/agree`, data)
+
+export const verifyRefuse = (data: { id: string }): Promise<Order.ResponseData> => fetch.post(`/admin/trader/manager/verify/refuse`, data)

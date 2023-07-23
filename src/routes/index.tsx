@@ -19,6 +19,12 @@ const routes = [
     component:lazy(() => import("../pages/AdminLogin"))
   },
   {
+    path: '/trader-register',
+    auth: false,
+    name:"adminLogin",
+    component:lazy(() => import("../pages/TraderRegister"))
+  },
+  {
     path: '/pay',
     auth: false,
     name:"pay",
@@ -90,6 +96,11 @@ const routes = [
         path: '/trader/new-card',
         auth: true,
         component:lazy(() => import('../pages/NewCard'))
+      },
+      { 
+        path: '/trader/update',
+        auth: true,
+        component:lazy(() => import('../pages/UpdateInfo'))
       },
       { 
         path: '*',

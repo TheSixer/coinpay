@@ -22,6 +22,8 @@ export const queryRechargeList = (data: any): Promise<Order.ResponseData> => fet
 export const queryWithdrawList = (data: any): Promise<Order.ResponseData> => fetch.get(`/trader/withdraw/list?${qs.stringify(data)}`)
 
 export const queryPolicy = (): Promise<Order.ResponseData> => fetch.get(`/trader/oss/verify/policy`)
+
+export const queryRegisterPolicy = (): Promise<Order.ResponseData> => fetch.get(`/trader/oss/register/policy`)
 // 加签
 export const getImgUrl = (objectName: string): Promise<Order.ResponseData> => fetch.get(`/trader/oss/sign?objectName=${objectName}`);
 
@@ -36,3 +38,9 @@ export const traderWithdraw = (data: any): Promise<Order.ResponseData> => fetch.
 export const traderRecharge = (data: any): Promise<Order.ResponseData> => fetch.post(`/trader/recharge`, data)
 
 export const queryNotice = (): Promise<Order.ResponseData> => fetch.get(`/trader/notice/count`)
+
+export const traderRegister = (data: any): Promise<Order.ResponseData> => fetch.post(`/trader/register`, data)
+
+export const updateInfo = (data: any): Promise<Order.ResponseData> => fetch.post(`/trader/verify/update`, data)
+
+export const queryTraderInfo = (): Promise<Order.ResponseData> => fetch.get(`/trader/info`)
