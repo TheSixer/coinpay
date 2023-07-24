@@ -92,8 +92,8 @@ const Login = () => {
   }
 
   return (
-    <div className="flex items-center justify-center h-full">
-      <Card sx={{ minWidth: 600 }}>
+    <div className="flex items-center justify-center max-w-xl mx-auto py-2">
+      <Card sx={{ width: '100%' }}>
         <CardContent sx={{ py: 4, px: 4, textAlign: 'center' }}>
           <Typography sx={{ textAlign: 'left', fontWeight: 600, marginBottom: 4 }} variant="h6" gutterBottom>
             交易员注册

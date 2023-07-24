@@ -80,7 +80,7 @@ const Login = () => {
             </FormControl>
           </Stack>
           <Button sx={{ mt: 6, mb: 4, width: '100%' }} disabled={loading || !userName || !password} variant="contained" onClick={handleSubmit}>登 录</Button>
-          <a className="underline" href="/">交易员登录</a>
+          <a className="underline hover:text-zinc-300" href="/">交易员登录</a>
         </CardContent>
       </Card>
     </div>

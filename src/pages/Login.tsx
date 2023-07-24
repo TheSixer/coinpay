@@ -82,7 +82,8 @@ const Login = () => {
             </FormControl>
           </Stack>
           <Button sx={{ mt: 6, mb: 4, width: '100%' }} disabled={loading || !userName || !password} variant="contained" onClick={handleSubmit}>登 录</Button>
-          <a className="underline" href="/admin-login">管理员登录</a>
+          <p className="mb-2">没有账号？<a className="underline hover:text-zinc-300" href="/trader-register">立即注册</a></p>
+          <a className="underline hover:text-zinc-300" href="/admin-login">管理员登录</a>
         </CardContent>
       </Card>
     </div>
