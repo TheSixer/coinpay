@@ -61,7 +61,7 @@ function EnhancedTableToolbar(props: any) {
   const {
     run: handleSearch,
   } = useThrottleFn(() => {
-    props.onSearch(status);
+    props.onSearch(status < 0 ? '' : status);
   });
 
   return (
@@ -112,18 +112,19 @@ const TradingList = () => {
 
   const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage);
-    fetchList({ page: newPage + 1, limit: rowsPerPage });
+    fetchList({ page: newPage + 1, limit: rowsPerPage, status });
   };
 
   const handleChangeRowsPerPage = (event: any) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    fetchList({ page: 1, limit: event.target.value });
+    fetchList({ page: 1, limit: event.target.value, status });
   };
 
   const handleSearch = (status: number) => {
     setStatus(status);
-    fetchList({ page: page + 1, limit: rowsPerPage, status: status < 0 ? '' : status });
+    setPage(0);
+    fetchList({ page: 1, limit: rowsPerPage, status });
   }
 
   return (

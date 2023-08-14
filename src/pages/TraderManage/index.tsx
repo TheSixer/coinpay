@@ -243,7 +243,8 @@ const TradingList = () => {
   const handleSearch = (verify: string, realName: string) => {
     setVerify(verify);
     serRealName(realName);
-    fetchList({ page: page + 1, limit: rowsPerPage, verify: verify === '-1' ? '' : verify, realName });
+    setPage(0);
+    fetchList({ page: 1, limit: rowsPerPage, verify: verify === '-1' ? '' : verify, realName });
   }
 
   return (

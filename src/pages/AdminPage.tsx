@@ -67,6 +67,7 @@ const TraderPage = () => {
           <Tab label="汇率管理" id="rate" />
           <Tab label="入金审核" id="recharge" />
           <Tab label="出金审核" id="withdraw" />
+          <Tab label="全部订单" id="orderList" />
           <Tab label="交易员管理" id="trader" />
         </Tabs>
       </div>

@@ -75,12 +75,12 @@ function EnhancedTableHead() {
 }
 
 function EnhancedTableToolbar(props: any) {
-  const [status, setStatus] = useState('wait');
+  const [status, setStatus] = useState('-1');
 
   const {
     run: handleSearch,
   } = useThrottleFn(() => {
-    props.onSearch(status);
+    props.onSearch(status === '-1' ? '' : status);
   });
 
   return (
@@ -96,6 +96,7 @@ function EnhancedTableToolbar(props: any) {
             sx={{ color: 'white', borderColor: grey[400] }}
             onChange={e => setStatus(e.target.value)}
           >
+            <MenuItem value={'-1'}>全部</MenuItem>
             <MenuItem value={'wait'}>待支付</MenuItem>
             <MenuItem value={'confirm'}>已转账</MenuItem>
             <MenuItem value={'paid'}>已支付</MenuItem>
@@ -135,13 +136,13 @@ const TradingList = () => {
 
   const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage);
-    fetchList({ page: newPage + 1, limit: rowsPerPage });
+    fetchList({ page: newPage + 1, limit: rowsPerPage, status });
   };
 
   const handleChangeRowsPerPage = (event: any) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    fetchList({ page: 1, limit: event.target.value });
+    fetchList({ page: 1, limit: event.target.value, status });
   };
 
   const { run: handleConfirm } = useThrottleFn(async () => {
@@ -149,7 +150,7 @@ const TradingList = () => {
       orderCode,
     })
     if (!code) {
-      fetchList({ page: 1, limit: rowsPerPage });
+      fetchList({ page: 1, limit: rowsPerPage, status });
       setIsShowConfirm(false);
     } else {
       toast.error(msg)
@@ -163,7 +164,7 @@ const TradingList = () => {
     })
     if (!code) {
       setPage(0);
-      fetchList({ page: 1, limit: rowsPerPage });
+      fetchList({ page: 1, limit: rowsPerPage, status });
       setIsShowReject(false);
     } else {
       toast.error(msg)
@@ -172,7 +173,8 @@ const TradingList = () => {
 
   const handleSearch = (status: string) => {
     setStatus(status);
-    fetchList({ page: page + 1, limit: rowsPerPage, status });
+    setPage(0);
+    fetchList({ page: 1, limit: rowsPerPage, status });
   }
 
   return (

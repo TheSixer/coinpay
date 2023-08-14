@@ -44,3 +44,5 @@ export const traderRegister = (data: any): Promise<Order.ResponseData> => fetch.
 export const updateInfo = (data: any): Promise<Order.ResponseData> => fetch.post(`/trader/verify/update`, data)
 
 export const queryTraderInfo = (): Promise<Order.ResponseData> => fetch.get(`/trader/info`)
+
+export const queryOrderList = (data: any): Promise<Order.ResponseData> => fetch.get(`/admin/customer/order/list?${qs.stringify(data)}`)

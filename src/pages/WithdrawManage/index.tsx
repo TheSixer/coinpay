@@ -128,13 +128,13 @@ const TradingList = () => {
 
   const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage);
-    fetchList({ page: newPage + 1, limit: rowsPerPage });
+    fetchList({ page: newPage + 1, limit: rowsPerPage, status: status < 0 ? '' : status });
   };
 
   const handleChangeRowsPerPage = (event: any) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    fetchList({ page: 1, limit: event.target.value });
+    fetchList({ page: 1, limit: event.target.value, status: status < 0 ? '' : status });
   };
 
   const { run: handleConfirm } = useThrottleFn(async () => {
@@ -142,7 +142,7 @@ const TradingList = () => {
       orderCode,
     })
     if (!code) {
-      fetchList({ page: 1, limit: rowsPerPage });
+      fetchList({ page: 1, limit: rowsPerPage, status: status < 0 ? '' : status });
       setIsShowConfirm(false);
     } else {
       toast.error(msg)
@@ -156,7 +156,7 @@ const TradingList = () => {
     })
     if (!code) {
       setPage(0);
-      fetchList({ page: 1, limit: rowsPerPage });
+      fetchList({ page: 1, limit: rowsPerPage, status: status < 0 ? '' : status });
       setIsShowReject(false);
     } else {
       toast.error(msg)
@@ -165,7 +165,8 @@ const TradingList = () => {
 
   const handleSearch = (status: number) => {
     setStatus(status);
-    fetchList({ page: page + 1, limit: rowsPerPage, status: status < 0 ? '' : status });
+    setPage(0);
+    fetchList({ page: 1, limit: rowsPerPage, status: status < 0 ? '' : status });
   }
 
   return (

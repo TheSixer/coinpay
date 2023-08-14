@@ -43,6 +43,14 @@ export default function BasicList() {
               <ListItemText primary="出金审核" />
             </ListItemButton>
           </ListItem>
+          <ListItem selected={pathname === '/admin/orders'} disablePadding>
+            <ListItemButton onClick={() => navigate('/admin/orders')}>
+              <ListItemIcon>
+                <ReceiptLongIcon color='secondary' />
+              </ListItemIcon>
+              <ListItemText primary="全部订单" />
+            </ListItemButton>
+          </ListItem>
           <ListItem selected={pathname === '/admin/trader'} disablePadding>
             <ListItemButton onClick={() => navigate('/admin/trader')}>
               <ListItemIcon>

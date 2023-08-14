@@ -51,6 +51,11 @@ const routes = [
         component:lazy(() => import('../pages/WithdrawManage'))
       },
       { 
+        path: '/admin/orders',
+        auth: true,
+        component:lazy(() => import('../pages/OrderList'))
+      },
+      { 
         path: '/admin/trader',
         auth: true,
         component:lazy(() => import('../pages/TraderManage'))

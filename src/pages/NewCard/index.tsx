@@ -3,11 +3,13 @@ import { Button, Container, Paper, Stack, TextField, Typography } from "@mui/mat
 import { saveCard } from "../../services/order";
 import { useThrottleFn } from "ahooks";
 import { toast } from 'react-toastify'
+import { useNavigate } from "react-router-dom";
 
 const Recharge = () => {
   const [bankName, setBankName] = useState('');
   const [subBankName, setSubBankName] = useState('');
   const [bankCardNum, setBankCardNum] = useState('');
+  const navigate = useNavigate();
 
   const {
     run: handleSave,
@@ -21,6 +23,7 @@ const Recharge = () => {
       setBankName('');
       setSubBankName('');
       setBankCardNum('');
+      navigate(-1);
     });
   }, { wait: 700 });
   
