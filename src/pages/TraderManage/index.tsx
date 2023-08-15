@@ -31,13 +31,13 @@ function EnhancedTableHead() {
       id: 'balance',
       numeric: true,
       disablePadding: true,
-      label: '余额（USDT）'
+      label: '可用余额（USDT）'
     },
     {
       id: 'coolBalance',
       numeric: true,
       disablePadding: true,
-      label: '可用余额（USDT）'
+      label: '冻结余额（USDT）'
     },
     {
       id: 'realName',
@@ -55,7 +55,7 @@ function EnhancedTableHead() {
       id: 'idCardUrl',
       numeric: true,
       disablePadding: true,
-      label: '交易凭证'
+      label: '身份证照片'
     },
     {
       id: 'status',

@@ -56,6 +56,12 @@ function EnhancedTableHead() {
       disablePadding: true,
       label: '状态'
     },
+    {
+      id: 'traderName',
+      numeric: true,
+      disablePadding: true,
+      label: '交易员'
+    },
     // {
     //   id: 'id',
     //   numeric: true,
@@ -100,7 +106,7 @@ function EnhancedTableToolbar(props: any) {
             <MenuItem value={'wait'}>待支付</MenuItem>
             <MenuItem value={'confirm'}>已转账</MenuItem>
             <MenuItem value={'paid'}>已支付</MenuItem>
-            <MenuItem value={'cancle'}>已取消</MenuItem>
+            <MenuItem value={'cancel'}>已取消</MenuItem>
             <MenuItem value={'reject'}>已拒绝</MenuItem>
           </Select>
         </FormControl>
@@ -206,13 +212,14 @@ const TradingList = () => {
                   <TableCell align="left">{row.realName || '-'}</TableCell>
                   <TableCell align="left">{row.createTime}</TableCell>
                   <TableCell align="left">{row.updateTime}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align="left">
                     <Chip
-                      label={row.status === 'wait' ? '待支付' : row.status === 'confirm' ? '已转账' : row.status === 'paid' ? '已支付' : row.status === 'cancle' ? '已取消' : '已驳回'}
-                      color={row.status === 'wait' ? 'warning' : row.status === 'paid' || row.status === 'confirm' ? 'success' : 'error'}
+                      label={row.status === 'wait' ? '待支付' : row.status === 'confirm' ? '已转账' : row.status === 'paid' ? '已支付' : row.status === 'cancel' ? '已取消' : '已驳回'}
+                      color={row.status === 'wait' ? 'warning' : row.status === 'paid' || row.status === 'confirm' ? 'success' : row.status === 'cancel' ? 'default' : 'error'}
                       variant="outlined"
                     />
                   </TableCell>
+                  <TableCell align="right">{row.traderName}</TableCell>
                   {/* <TableCell align="left">
                     {
                       row.status === 'confirm' ? (
@@ -235,7 +242,7 @@ const TradingList = () => {
                         </>
                       ): (
                         <Chip
-                          label={row.status === 'wait' ? '待支付' : row.status === 'confirm' ? '已完成' : row.status === 'paid' ? '已支付' : row.status === 'cancle' ? '已取消' : '已驳回'}
+                          label={row.status === 'wait' ? '待支付' : row.status === 'confirm' ? '已完成' : row.status === 'paid' ? '已支付' : row.status === 'cancel' ? '已取消' : '已驳回'}
                           variant="outlined"
                         />
                       )
